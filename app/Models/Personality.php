@@ -5,7 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Personality extends Model
+class User extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        "username",
+        "firstname",
+        "lastname",
+        "bio",
+        "profile",
+        "date_verified",
+        "password"
+    ];
+
+    public function Personality(){
+        return $this->hasOne(Personality::class);
+    }
 }
