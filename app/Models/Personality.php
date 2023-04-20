@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Personality extends Model
 {
     use HasFactory;
 
@@ -19,7 +19,7 @@ class User extends Model
         "password"
     ];
 
-    public function Personality(){
-        return $this->hasOne(Personality::class);
+    public function User(){
+        return $this->belongsTo(User::class);
     }
 }

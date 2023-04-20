@@ -26,7 +26,7 @@ class MessageController extends Controller
         }
 
         $message = Message::create([
-            "sender" => $request->senrder,
+            "sender" => $request->sender,
             "receiver" => $request->receiver,
             'message' => $request->message,
         ]);

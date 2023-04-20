@@ -15,8 +15,6 @@ class FindMatchController extends Controller
         $user = User::find($request->userId)->Personality;
         // $user = Personality::WHERE('user_id', $request->userId)->first();
 
-        // dd($user);
-
         $matches = DB::table('personalities')
             ->select(
                 DB::raw("personalities.user_id, 
@@ -29,10 +27,7 @@ class FindMatchController extends Controller
                     CASE WHEN personalities.question7 = $user->question7 THEN 1 ELSE 0 END +
                     CASE WHEN personalities.question8 = $user->question8 THEN 1 ELSE 0 END +
                     CASE WHEN personalities.question9 = $user->question9 THEN 1 ELSE 0 END +
-                    CASE WHEN personalities.question10 = $user->question10 THEN 1 ELSE 0 END AS score,
-                    users.firstname
-                    JOIN users ON users.id = personalities.user_id
-                    WHERE users.gender = '$user->gender'
+                    CASE WHEN personalities.question10 = $user->question10 THEN 1 ELSE 0 END AS score
                     "),
             )
             ->get();
