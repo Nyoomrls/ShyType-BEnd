@@ -10,16 +10,21 @@ class Personality extends Model
     use HasFactory;
 
     protected $fillable = [
-        "username",
-        "firstname",
-        "lastname",
-        "bio",
-        "profile",
-        "date_verified",
-        "password"
+        "user_id",
+        "question1",
+        "question2",
+        "question3",
+        "question4",
+        "question5",
+        "question6",
+        "question7",
+        "question8",
+        "question9",
+        "question10",
     ];
 
-    public function User(){
+    public function post()
+    {
         return $this->belongsTo(User::class);
     }
 }

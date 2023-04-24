@@ -13,13 +13,18 @@ class User extends Model
         "username",
         "firstname",
         "lastname",
+        "email",
         "bio",
+        "age",
+        "gender",
+        "matchgender",
         "profile",
+        "password",
+        "ishidden",
         "date_verified",
-        "password"
     ];
 
-    public function personality(){
+    public function Personality(){
         return $this->hasOne(Personality::class);
     }
 }

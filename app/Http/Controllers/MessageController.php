@@ -13,8 +13,8 @@ class MessageController extends Controller
     public function send_message(Request $request)
     {
         $fields = Validator::make($request->all(), [
-            'sender' => ['required', 'string'],
-            'receiver' => ['required', 'string'],
+            'sender' => ['required', 'integer'],
+            'receiver' => ['required', 'integer'],
             'message' => ['required', 'string'],
         ]);
 
@@ -25,11 +25,18 @@ class MessageController extends Controller
             ];
         }
 
-        $message = Message::create([
-            "sender" => $request->sender,
-            "receiver" => $request->receiver,
-            'message' => $request->message,
-        ]);
+        $message = new Message;
+
+        $message->sender = $request->sender;
+        $message->receiver = $request->receiver;
+        $message->message = $request->message;
+
+        if ($request->receiver > $request->sender) {
+            $message->conversation_id = $request->receiver . $request->sender;
+        } else {
+            $message->conversation_id = $request->sender . $request->receiver;
+        }
+
         $successMessage = $message->save();
 
         if ($successMessage) {
@@ -48,39 +55,40 @@ class MessageController extends Controller
 
     public function get_conversation(Request $request)
     {
-        if ($request->to > $request->from) {
-            $conversation_id = $request->to . $request->from;
+        if ($request->receiver > $request->sender) {
+            $conversation_id = $request->receiver . $request->sender;
         } else {
-            $conversation_id = $request->from . $request->to;
+            $conversation_id = $request->sender . $request->receiver;
         }
 
         $messages = Message::where('conversation_id', $conversation_id)->get();
+        $user = User::where('id', $request->owner)->get();
 
         $structMessage = array();
         foreach ($messages as $key => $message) {
             array_push($structMessage, [
                 'message' => $messages[$key]->message,
                 'time' => Carbon::createFromTimeStamp(strtotime($messages[$key]->created_at))->diffForHumans(),
-                'userid' => $messages[$key]->from,
+                'userid' => $messages[$key]->sender,
             ]);
         }
 
-        return ['status' => 'success', 'data' => $structMessage];
+        return ['status' => 'success', 'data' => $structMessage, 'user' => $user];
     }
 
-    public function get_chats(Request $request, $userId)
+    public function get_chats(Request $request)
     {
         $messageFrom = Message::where('sender', $request->sender)->orwhere('receiver', $request->sender)->orderBy('created_at', 'desc')->get()->unique('conversation_id');
 
         $messageInbox = array();
         foreach ($messageFrom as $key => $message) {
-            if ($request->from !== $message->from) {
-                $user = User::find($message->from);
+            if ($request->sender != $message->sender) {
+                $user = User::find($message->sender);
                 $messageFrom[$key]['user'] = $user;
 
                 array_push($messageInbox, $message);
-            } else if ($request->from !== $message->to) {
-                $user = User::find($message->to);
+            } else if ($request->sender != $message->receiver) {
+                $user = User::find($message->receiver);
                 $messageFrom[$key]['user'] = $user;
 
                 array_push($messageInbox, $message);
