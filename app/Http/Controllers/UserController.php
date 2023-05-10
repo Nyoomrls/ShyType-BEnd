@@ -7,7 +7,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -51,10 +53,11 @@ class UserController extends Controller
             "email" => $request->userBio['email'],
             "age" => $request->userBio['age'],
             "bio" => '',
+            "contact" => "",
             "gender" => $request->userBio['gender'],
             "matchgender" => $request->userBio['matchgender'],
-            "profile" => '',
-            "ishidden" => 1,
+            "profile" => "",
+            "ishidden" => 0,
             "date_verified" => Carbon::now()->toDateTimeString(),
             'password' => Hash::make($request->password),
         ]);
@@ -105,7 +108,7 @@ class UserController extends Controller
 
         $user = User::where('email',  $request->credentials['email'])->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->credentials['password'], $user->password)) {
             return [
                 'message' => "Bad credentials",
                 'status' => 401
@@ -121,10 +124,15 @@ class UserController extends Controller
 
     public function profile(Request $request)
     {
+        $compPic = "";
+        if (isset($request->user['profile'])) {
+            $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $request->user['profile']));
+            $compPic =  '_image' . time() . '.' . 'jpg';
+            Storage::disk('public')->put($compPic, $image);
+        }
+
         $fields = Validator::make($request->user, [
             'username' => ['required', 'string'],
-            'bio' => ['required', 'string'],
-            'contact' => ['required', 'string'],
         ]);
 
         if ($fields->fails()) {
@@ -134,7 +142,7 @@ class UserController extends Controller
             ];
         }
 
-        if ($request->npassword !== null) {
+        if (isset($request->user['npassword'])) {
             $password = $request->user['npassword'];
         } else {
             $password = $request->user['password'];
@@ -142,10 +150,34 @@ class UserController extends Controller
 
         $user = User::find($request->user['id']);
         $user->username = $request->user['username'];
-        $user->bio = $request->user['bio'];
-        $user->contact = $request->user['contact'];
-        $user->profile = $request->user['profile'] || "";
-        $user->password = Hash::make($password);
+        $user->bio = isset($request->user['bio']) ? $request->user['bio'] : "";
+        $user->contact = isset($request->user['contact']) ? $request->user['contact'] : "";
+        $user->profile = $compPic !== '' ? $compPic : "";
+        $user->password = isset($request->user['npassword']) ? Hash::make($password) : $password;
+        $user->save();
+
+        return [
+            "message" => "Successfully updated data",
+            "data" => $user,
+            "status" => 200,
+        ];
+    }
+
+    public function user_hide_unhide_info(Request $request)
+    {
+        $fields = Validator::make($request->user, [
+            'ishidden' => ['required', 'string'],
+        ]);
+
+        if ($fields->fails()) {
+            return [
+                'error' => 'Bad credentials',
+                'status' => 401
+            ];
+        }
+
+        $user = User::find($request->user['id']);
+        $user->ishidden = $request->user['ishidden'];
         $user->save();
 
         return [

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+
+use function GuzzleHttp\Promise\all;
 
 class AdminController extends Controller
 {
@@ -72,5 +75,28 @@ class AdminController extends Controller
             "message" => "Successfully logged in",
             "status" => 200
         ];
+    }
+
+    public function admin_ban_user(Request $request)
+    {
+        $fields = Validator::make($request->all(), [
+            'userId' => ['required', 'string']
+        ]);
+
+        if ($fields->fails()) {
+            return [
+                'error' => 'Invalid data',
+                'status' => 401
+            ];
+        }
+
+        $user = User::find($request->user['id']);
+        $user->delete();
+    }
+
+    public function admin_get_users(Request $request)
+    {
+        $users = User::get();
+        return $users;
     }
 }
