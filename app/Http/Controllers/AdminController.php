@@ -8,11 +8,13 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use function GuzzleHttp\Promise\all;
 
 class AdminController extends Controller
 {
+    use SoftDeletes;
     public function register(Request $request)
     {
         $fields = Validator::make($request->all(), [
@@ -80,7 +82,7 @@ class AdminController extends Controller
     public function admin_ban_user(Request $request)
     {
         $fields = Validator::make($request->all(), [
-            'userId' => ['required', 'string']
+            'userId' => ['required']
         ]);
 
         if ($fields->fails()) {
@@ -90,13 +92,35 @@ class AdminController extends Controller
             ];
         }
 
-        $user = User::find($request->user['id']);
+        $user = User::find($request->userId);
         $user->delete();
     }
 
+    public function admin_unban_user(Request $request)
+    {
+        $fields = Validator::make($request->all(), [
+            'userId' => ['required']
+        ]);
+
+        if ($fields->fails()) {
+            return [
+                'error' => 'Invalid data',
+                'status' => 401
+            ];
+        }
+
+        $user = User::withTrashed()->find($request->userId)->restore();
+    }
     public function admin_get_users(Request $request)
     {
         $users = User::get();
         return $users;
     }
+
+    public function admin_get_ban_users(Request $request)
+    {
+        $users = User::onlyTrashed()->get();
+        return $users;
+    }
+
 }

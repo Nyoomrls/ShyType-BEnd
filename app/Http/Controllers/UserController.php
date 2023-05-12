@@ -59,7 +59,7 @@ class UserController extends Controller
             "profile" => "",
             "ishidden" => 0,
             "date_verified" => Carbon::now()->toDateTimeString(),
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($request->userBio['password']),
         ]);
 
         $newUser = $user->save();
@@ -107,8 +107,10 @@ class UserController extends Controller
         }
 
         $user = User::where('email',  $request->credentials['email'])->first();
-
-        if (!$user || !Hash::check($request->credentials['password'], $user->password)) {
+        // $user = User::where('email',  $request->email)->first();
+        // if (!$user || !Hash::check($request->password, $user->password))
+        if (!$user || !Hash::check($request->credentials['password'], $user->password))
+         {
             return [
                 'message' => "Bad credentials",
                 'status' => 401
@@ -154,6 +156,7 @@ class UserController extends Controller
         $user->contact = isset($request->user['contact']) ? $request->user['contact'] : "";
         $user->profile = $compPic !== '' ? $compPic : "";
         $user->password = isset($request->user['npassword']) ? Hash::make($password) : $password;
+        $user->ishidden = isset($request->user['ishidden']);
         $user->save();
 
         return [

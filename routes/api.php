@@ -35,8 +35,11 @@ Route::get('/user/convo', [MessageController::class, 'get_conversation']);
 
 Route::get('/user/visibility', [UserController::class, 'user_hide_unhide_info']);
 
-Route::get('/admin/ban', [AdminController::class, 'admin_ban_user']);
+Route::put('/admin/ban', [AdminController::class, 'admin_ban_user']);
+Route::put('/admin/unban', [AdminController::class, 'admin_unban_user']);
 Route::get('/admin/users', [AdminController::class, 'admin_get_users']);
+Route::get('/admin/banUsers', [AdminController::class, 'admin_get_ban_users']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
