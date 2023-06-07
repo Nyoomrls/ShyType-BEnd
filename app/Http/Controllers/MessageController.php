@@ -61,6 +61,7 @@ class MessageController extends Controller
             $conversation_id = $request->sender . $request->receiver;
         }
 
+        // $messages = Message::where('conversation_id', $conversation_id)->get();
         $messages = Message::where('conversation_id', $conversation_id)->get();
         $user = User::where('id', $request->owner)->get();
 
