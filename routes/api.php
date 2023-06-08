@@ -5,6 +5,7 @@ use App\Http\Controllers\FindMatchController;
 use App\Http\Controllers\MatchesController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BlockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,9 @@ Route::get('/user/match', [FindMatchController::class, 'find_match']);
 Route::post('/user/message', [MessageController::class, 'send_message']);
 Route::get('/user/chats', [MessageController::class, 'get_chats']);
 Route::get('/user/convo', [MessageController::class, 'get_conversation']);
+
+Route::post('/user/block', [BlockController::class, 'blockUser']);
+
 
 Route::get('/user/visibility', [UserController::class, 'user_hide_unhide_info']);
 
