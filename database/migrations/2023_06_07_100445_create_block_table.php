@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer("blockerID");
             $table->integer("blockedID");
             $table->timestamps();
+            // $table->softDeletes();
         });
     }
 

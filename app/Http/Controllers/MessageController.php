@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Termwind\Components\Dd;
 
 class MessageController extends Controller
 {
@@ -79,7 +81,16 @@ class MessageController extends Controller
 
     public function get_chats(Request $request)
     {
-        $messageFrom = Message::where('sender', $request->sender)->orwhere('receiver', $request->sender)->orderBy('created_at', 'desc')->get()->unique('conversation_id');
+        $messageFrom = Message::where('sender', $request->sender)
+            ->orwhere('receiver', $request->sender)
+            ->orderBy('created_at', 'desc')
+            ->get()->unique('conversation_id');
+
+        // $messageFrom = Message::join('blocks', 'blocks.blockerID', '=', 'message.sender')
+        //         ->where('sender', $request->sender)
+        //         ->where($request->sender , 'blocks.sender')
+        //         ->get()->unique('conversation_id');
+            // dd($messageFrom);
 
         $messageInbox = array();
         foreach ($messageFrom as $key => $message) {
