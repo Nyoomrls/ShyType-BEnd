@@ -81,16 +81,24 @@ class MessageController extends Controller
 
     public function get_chats(Request $request)
     {
-        $messageFrom = Message::where('sender', $request->sender)
-            ->orwhere('receiver', $request->sender)
-            ->orderBy('created_at', 'desc')
-            ->get()->unique('conversation_id');
+        // $messageFrom = Message::where('sender', $request->sender)
+        //     ->orwhere('receiver', $request->sender)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get()->unique('conversation_id');
 
-        // $messageFrom = Message::join('blocks', 'blocks.blockerID', '=', 'message.sender')
-        //         ->where('sender', $request->sender)
-        //         ->where($request->sender , 'blocks.sender')
-        //         ->get()->unique('conversation_id');
-            // dd($messageFrom);
+        $messageFrom = Message::where(function ($query) use ($request) {
+            $query->where('sender', $request->sender)
+                ->orWhere('receiver', $request->sender);
+        })
+            ->whereNotIn('receiver', function ($subQuery) {
+                $subQuery->select('blockedID')
+                    ->from('Blocks');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->unique('conversation_id');
+
+
 
         $messageInbox = array();
         foreach ($messageFrom as $key => $message) {

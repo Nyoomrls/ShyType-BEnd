@@ -12,6 +12,7 @@ class Block extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        "id",
         "blockerID",
         "blockedID",
     ];
