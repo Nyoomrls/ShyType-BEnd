@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Block extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         "id",

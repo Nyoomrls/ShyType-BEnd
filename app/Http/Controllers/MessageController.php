@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\User;
+use App\Models\Block;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Http\Request;
@@ -81,40 +82,62 @@ class MessageController extends Controller
 
     public function get_chats(Request $request)
     {
-        // $messageFrom = Message::where('sender', $request->sender)
-        //     ->orwhere('receiver', $request->sender)
-        //     ->orderBy('created_at', 'desc')
-        //     ->get()->unique('conversation_id');
-
-        $messageFrom = Message::where(function ($query) use ($request) {
-            $query->where('sender', $request->sender)
-                ->orWhere('receiver', $request->sender);
-        })
-            ->whereNotIn('receiver', function ($subQuery) {
-                $subQuery->select('blockedID')
-                    ->from('Blocks');
-            })
+        $messageFrom = Message::where('sender', $request->sender)
+            ->orwhere('receiver', $request->sender)
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->unique('conversation_id');
+            ->get()->unique('conversation_id');
 
-
+        // $messageFrom = Message::where(function ($query) use ($request) {
+        //     $query->where('sender', $request->sender)
+        //         ->orWhere('receiver', $request->sender);
+        // })
+        //     ->whereNotIn('receiver', function ($subQuery) {
+        //         $subQuery->select('blockedID')
+        //             ->from('Blocks');
+        //     })
+        //     ->orderBy('created_at', 'desc')
+        //     ->get()
+        //     ->unique('conversation_id');
 
         $messageInbox = array();
         foreach ($messageFrom as $key => $message) {
             if ($request->sender != $message->sender) {
-                $user = User::find($message->sender);
-                $messageFrom[$key]['user'] = $user;
+                $data = Block::where('blockerID', $request->sender)->where('blockedID', $message->sender)->get();
 
-                array_push($messageInbox, $message);
+                // return json_encode($data);
+                if (sizeof($data) == 0) {
+                    $user = User::find($message->sender);
+                    $messageFrom[$key]['user'] = $user;
+                    array_push($messageInbox, $message);
+                }
             } else if ($request->sender != $message->receiver) {
-                $user = User::find($message->receiver);
-                $messageFrom[$key]['user'] = $user;
+                $data = Block::where('blockerID', $request->sender)->where('blockedID', $message->receiver)->get();
 
-                array_push($messageInbox, $message);
+                // return json_encode($data);
+                if (sizeof($data) == 0) {
+                    $user = User::find($message->receiver);
+                    $messageFrom[$key]['user'] = $user;
+                    array_push($messageInbox, $message);
+                }
             }
         }
 
         return ['status' => 'success', 'data' => $messageInbox];
+    }
+
+
+
+    public function markAsRead(Request $request)
+    {
+        $sender = $request->input('sender');
+        $receiver = $request->input('receiver');
+
+        // Assuming you have a 'messages' table with an 'isRead' column
+        Message::where('sender', $sender)
+            ->where('receiver', $receiver)
+            ->update(['isRead' => true]);
+
+        return response()
+            ->json(['status' => 'success', 'message' => 'Conversation marked as read.']);
     }
 }
