@@ -87,33 +87,21 @@ class MessageController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()->unique('conversation_id');
 
-        // $messageFrom = Message::where(function ($query) use ($request) {
-        //     $query->where('sender', $request->sender)
-        //         ->orWhere('receiver', $request->sender);
-        // })
-        //     ->whereNotIn('receiver', function ($subQuery) {
-        //         $subQuery->select('blockedID')
-        //             ->from('Blocks');
-        //     })
-        //     ->orderBy('created_at', 'desc')
-        //     ->get()
-        //     ->unique('conversation_id');
-
         $messageInbox = array();
         foreach ($messageFrom as $key => $message) {
             if ($request->sender != $message->sender) {
-                $data = Block::where('blockerID', $request->sender)->where('blockedID', $message->sender)->get();
-
-                // return json_encode($data);
+                $data = Block::where('blockerID', $request->sender)
+                    ->where('blockedID', $message->sender)->get();
+                    
                 if (sizeof($data) == 0) {
                     $user = User::find($message->sender);
                     $messageFrom[$key]['user'] = $user;
                     array_push($messageInbox, $message);
                 }
             } else if ($request->sender != $message->receiver) {
-                $data = Block::where('blockerID', $request->sender)->where('blockedID', $message->receiver)->get();
+                $data = Block::where('blockerID', $request->sender)
+                    ->where('blockedID', $message->receiver)->get();
 
-                // return json_encode($data);
                 if (sizeof($data) == 0) {
                     $user = User::find($message->receiver);
                     $messageFrom[$key]['user'] = $user;
