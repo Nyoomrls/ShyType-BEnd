@@ -109,8 +109,7 @@ class UserController extends Controller
         $user = User::where('email',  $request->credentials['email'])->first();
         // $user = User::where('email',  $request->email)->first();
         // if (!$user || !Hash::check($request->password, $user->password))
-        if (!$user || !Hash::check($request->credentials['password'], $user->password))
-         {
+        if (!$user || !Hash::check($request->credentials['password'], $user->password)) {
             return [
                 'message' => "Bad credentials",
                 'status' => 401

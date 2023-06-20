@@ -122,5 +122,4 @@ class AdminController extends Controller
         $users = User::onlyTrashed()->get();
         return $users;
     }
-
 }

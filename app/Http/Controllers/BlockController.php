@@ -29,9 +29,9 @@ class BlockController extends Controller
     public function unblockUser(Request $request)
     {
         $block = Block::where('blockerID', $request->blockerID)
-                      ->where('blockedID', $request->blockedID)
-                      ->first();
-    
+            ->where('blockedID', $request->blockedID)
+            ->first();
+
         if ($block) {
             $block->delete();
             return [
@@ -49,5 +49,4 @@ class BlockController extends Controller
             ];
         }
     }
-    
 }

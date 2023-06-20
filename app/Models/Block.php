@@ -16,5 +16,4 @@ class Block extends Model
         "blockerID",
         "blockedID",
     ];
-
 }

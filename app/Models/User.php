@@ -32,6 +32,6 @@ class User extends Model
     }
     public function Block()
     {
-        return $this->hasMany('app\Models\Block.php','blockedID','id');
+        return $this->hasMany('app\Models\Block.php', 'blockedID', 'id');
     }
 }
