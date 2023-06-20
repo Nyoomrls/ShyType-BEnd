@@ -93,7 +93,7 @@ class MessageController extends Controller
             if ($request->sender != $message->sender) {
                 $data = Block::where('blockerID', $request->sender)
                     ->where('blockedID', $message->sender)->get();
-                    
+
                 if (sizeof($data) == 0) {
                     $user = User::find($message->sender);
                     $messageFrom[$key]['user'] = $user;
@@ -115,17 +115,16 @@ class MessageController extends Controller
     }
 
 
-
     public function markAsRead(Request $request)
     {
         $sender = $request->input('sender');
         $receiver = $request->input('receiver');
-        
-        // Assuming you have a 'messages' table with an 'isRead' column
-        Message::where('sender', $sender)
-            ->where('receiver', $receiver)
+
+        Message::where('sender', $receiver) // Only update messages where the receiver is the sender
+            ->where('receiver', $sender)
             ->update(['isRead' => true]);
-    
+
         return response()->json(['status' => 'success', 'message' => 'Conversation marked as read.']);
     }
+
 }
