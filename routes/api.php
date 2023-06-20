@@ -32,11 +32,12 @@ Route::get('/user/match', [FindMatchController::class, 'find_match']);
 
 Route::post('/user/message', [MessageController::class, 'send_message']);
 Route::get('/user/chats', [MessageController::class, 'get_chats']);
+Route::get('/user/blocks', [MessageController::class, 'get_blocks']);
 Route::get('/user/convo', [MessageController::class, 'get_conversation']);
 Route::post('/user/convo/mark_as_read', [MessageController::class, 'markAsRead']);
 
 Route::post('/user/block', [BlockController::class, 'blockUser']);
-
+Route::post('/user/unblock', [BlockController::class, 'unBlockUser']);
 
 Route::get('/user/visibility', [UserController::class, 'user_hide_unhide_info']);
 

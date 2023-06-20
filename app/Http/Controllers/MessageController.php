@@ -114,6 +114,39 @@ class MessageController extends Controller
         return ['status' => 'success', 'data' => $messageInbox];
     }
 
+    public function get_blocks(Request $request)
+    {
+        $messageFrom = Message::where('sender', $request->sender)
+            ->orwhere('receiver', $request->sender)
+            ->orderBy('created_at', 'desc')
+            ->get()->unique('conversation_id');
+
+        $messageInbox = array();
+        foreach ($messageFrom as $key => $message) {
+            if ($request->sender != $message->sender) {
+                $data = Block::where('blockerID', $request->sender)
+                    ->where('blockedID', $message->sender)->get();
+
+                if (sizeof($data) > 0) {
+                    $user = User::find($message->sender);
+                    $messageFrom[$key]['user'] = $user;
+                    array_push($messageInbox, $message);
+                }
+            } else if ($request->sender != $message->receiver) {
+                $data = Block::where('blockerID', $request->sender)
+                    ->where('blockedID', $message->receiver)->get();
+
+                if (sizeof($data) > 0) {
+                    $user = User::find($message->receiver);
+                    $messageFrom[$key]['user'] = $user;
+                    array_push($messageInbox, $message);
+                }
+            }
+        }
+
+        return ['status' => 'success', 'data' => $messageInbox];
+    }
+
 
     public function markAsRead(Request $request)
     {
@@ -126,5 +159,4 @@ class MessageController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Conversation marked as read.']);
     }
-
 }
