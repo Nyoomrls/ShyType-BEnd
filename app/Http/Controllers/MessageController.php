@@ -74,6 +74,7 @@ class MessageController extends Controller
                 'message' => $messages[$key]->message,
                 'time' => Carbon::createFromTimeStamp(strtotime($messages[$key]->created_at))->diffForHumans(),
                 'userid' => $messages[$key]->sender,
+                'isRead' => $messages[$key]->isRead, // Add the isRead attribute here
             ]);
         }
 
@@ -119,13 +120,12 @@ class MessageController extends Controller
     {
         $sender = $request->input('sender');
         $receiver = $request->input('receiver');
-
+        
         // Assuming you have a 'messages' table with an 'isRead' column
         Message::where('sender', $sender)
             ->where('receiver', $receiver)
             ->update(['isRead' => true]);
-
-        return response()
-            ->json(['status' => 'success', 'message' => 'Conversation marked as read.']);
+    
+        return response()->json(['status' => 'success', 'message' => 'Conversation marked as read.']);
     }
 }
