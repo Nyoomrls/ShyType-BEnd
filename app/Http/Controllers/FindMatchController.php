@@ -34,6 +34,7 @@ class FindMatchController extends Controller
             ->leftJoin("users", "users.id", "=", "personalities.user_id")
             ->where("personalities.user_id", "<>", $request->userId)
             ->where("users.gender", "=", $user->matchgender)
+            ->having("score", ">=", 6) //Add the score filter
             ->get();
 
         return [

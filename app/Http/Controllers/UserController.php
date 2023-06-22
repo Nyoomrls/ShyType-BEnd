@@ -107,8 +107,6 @@ class UserController extends Controller
         }
 
         $user = User::where('email',  $request->credentials['email'])->first();
-        // $user = User::where('email',  $request->email)->first();
-        // if (!$user || !Hash::check($request->password, $user->password))
         if (!$user || !Hash::check($request->credentials['password'], $user->password)) {
             return [
                 'message' => "Bad credentials",
@@ -155,31 +153,8 @@ class UserController extends Controller
         $user->contact = isset($request->user['contact']) ? $request->user['contact'] : "";
         $user->profile = $compPic !== '' ? $compPic : "";
         $user->password = isset($request->user['npassword']) ? Hash::make($password) : $password;
-        $user->ishidden = isset($request->user['ishidden']);
-        $user->save();
 
-        return [
-            "message" => "Successfully updated data",
-            "data" => $user,
-            "status" => 200,
-        ];
-    }
-
-    public function user_hide_unhide_info(Request $request)
-    {
-        $fields = Validator::make($request->user, [
-            'ishidden' => ['required', 'string'],
-        ]);
-
-        if ($fields->fails()) {
-            return [
-                'error' => 'Bad credentials',
-                'status' => 401
-            ];
-        }
-
-        $user = User::find($request->user['id']);
-        $user->ishidden = $request->user['ishidden'];
+        if (isset($request->user['ishidden'])) {$user->ishidden = $request->user['ishidden'];}
         $user->save();
 
         return [
