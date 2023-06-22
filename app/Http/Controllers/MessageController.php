@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\Block;
+use App\Models\Matches;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Http\Request;
@@ -93,8 +94,8 @@ class MessageController extends Controller
             if ($request->sender != $message->sender) {
                 $data = Block::where('blockerID', $request->sender)
                     ->where('blockedID', $message->sender)->get();
-
-                if (sizeof($data) == 0) {
+    
+                if (sizeof($data) == 0 && $this->checkMatch($request->sender, $message->receiver)) {
                     $user = User::find($message->sender);
                     $messageFrom[$key]['user'] = $user;
                     array_push($messageInbox, $message);
@@ -102,17 +103,44 @@ class MessageController extends Controller
             } else if ($request->sender != $message->receiver) {
                 $data = Block::where('blockerID', $request->sender)
                     ->where('blockedID', $message->receiver)->get();
-
-                if (sizeof($data) == 0) {
+    
+                if (sizeof($data) == 0 && $this->checkMatch($request->sender, $message->receiver)) {
                     $user = User::find($message->receiver);
                     $messageFrom[$key]['user'] = $user;
                     array_push($messageInbox, $message);
                 }
             }
+            // if ($request->sender != $message->sender) {
+            //     $data = Block::where('blockerID', $request->sender)
+            //         ->where('blockedID', $message->sender)->get();
+
+            //     if (sizeof($data) == 0) {
+            //         $user = User::find($message->sender);
+            //         $messageFrom[$key]['user'] = $user;
+            //         array_push($messageInbox, $message);
+            //     }
+            // } else if ($request->sender != $message->receiver) {
+            //     $data = Block::where('blockerID', $request->sender)
+            //         ->where('blockedID', $message->receiver)->get();
+
+            //     if (sizeof($data) == 0) {
+            //         $user = User::find($message->receiver);
+            //         $messageFrom[$key]['user'] = $user;
+            //         array_push($messageInbox, $message);
+            //     }
+            // }
         }
 
         return ['status' => 'success', 'data' => $messageInbox];
     }
+
+    private function checkMatch($sender, $receiver)
+    {
+        return Matches::where('userID', $sender)
+            ->where('matchUser', $receiver)
+            ->exists();
+    }
+
 
     public function get_blocks(Request $request)
     {

@@ -38,6 +38,7 @@ Route::post('/user/convo/mark_as_read', [MessageController::class, 'markAsRead']
 
 Route::post('/user/block', [BlockController::class, 'blockUser']);
 Route::post('/user/unblock', [BlockController::class, 'unBlockUser']);
+Route::post('/user/unmatch_user', [BlockController::class, 'unmatchUser']);
 
 Route::put('/admin/ban', [AdminController::class, 'admin_ban_user']);
 Route::put('/admin/unban', [AdminController::class, 'admin_unban_user']);
