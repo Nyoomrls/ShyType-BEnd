@@ -29,10 +29,12 @@ Route::post('/auth/admin/login', [AdminController::class, 'login']);
 
 Route::post('/user/match', [MatchesController::class, 'save_match_response']);
 Route::get('/user/match', [FindMatchController::class, 'find_match']);
+Route::get('/user/newmatch', [FindMatchController::class, 'new_match']);
 
 Route::post('/user/message', [MessageController::class, 'send_message']);
 Route::get('/user/chats', [MessageController::class, 'get_chats']);
 Route::get('/user/blocks', [MessageController::class, 'get_blocks']);
+Route::get('/user/personalities', [MessageController::class, 'get_personalities']);
 Route::get('/user/convo', [MessageController::class, 'get_conversation']);
 Route::post('/user/convo/mark_as_read', [MessageController::class, 'markAsRead']);
 

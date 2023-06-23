@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FindMatch;
 use App\Models\Personality;
+use App\Models\Matches;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,7 @@ class FindMatchController extends Controller
             "status" => 200
         ];
 
+
         // $matches = DB::table('personalities')
         //     ->select(
         //         DB::raw("personalities.user_id, users.*,
@@ -81,6 +83,23 @@ class FindMatchController extends Controller
         //     "status" => 200
         // ];
     }
+
+    public function new_match(Request $request)
+    {
+        // $currentUser = $request->userId; 
+        $matches = Matches::where('userId', '=', $request->userId)
+            ->where('matchUser', $request->userId)
+            ->get();
+        $count = 0;
+        foreach ($matches as $match) {
+            if ($match->userId == $request->userId && $match->matchUser == $request->userId) {
+                $count++;
+            }
+        }
+        return $count;
+        var_dump($count);
+    }
+
 
     public function recent_match(Request $request)
     {

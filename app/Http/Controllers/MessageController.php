@@ -6,6 +6,7 @@ use App\Models\Message;
 use App\Models\User;
 use App\Models\Block;
 use App\Models\Matches;
+use App\Models\Personality;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Http\Request;
@@ -57,6 +58,8 @@ class MessageController extends Controller
         ];
     }
 
+
+
     public function get_conversation(Request $request)
     {
         if ($request->receiver > $request->sender) {
@@ -82,6 +85,20 @@ class MessageController extends Controller
         return ['status' => 'success', 'data' => $structMessage, 'user' => $user];
     }
 
+    public function get_personalities(Request $request)
+    {
+        $senderData = Personality::where('user_id', $request->sender)->get();
+        $receiverData = Personality::where('user_id', $request->receiver)->get();
+    
+        
+
+        return response()->json([
+            'sender_perso' => $senderData,
+            'receiver_perso' => $receiverData,
+        ], 200);
+    }
+    
+
     public function get_chats(Request $request)
     {
         $messageFrom = Message::where('sender', $request->sender)
@@ -94,7 +111,7 @@ class MessageController extends Controller
             if ($request->sender != $message->sender) {
                 $data = Block::where('blockerID', $request->sender)
                     ->where('blockedID', $message->sender)->get();
-    
+
                 if (sizeof($data) == 0 && $this->checkMatch($request->sender, $message->receiver)) {
                     $user = User::find($message->sender);
                     $messageFrom[$key]['user'] = $user;
@@ -103,32 +120,13 @@ class MessageController extends Controller
             } else if ($request->sender != $message->receiver) {
                 $data = Block::where('blockerID', $request->sender)
                     ->where('blockedID', $message->receiver)->get();
-    
+
                 if (sizeof($data) == 0 && $this->checkMatch($request->sender, $message->receiver)) {
                     $user = User::find($message->receiver);
                     $messageFrom[$key]['user'] = $user;
                     array_push($messageInbox, $message);
                 }
             }
-            // if ($request->sender != $message->sender) {
-            //     $data = Block::where('blockerID', $request->sender)
-            //         ->where('blockedID', $message->sender)->get();
-
-            //     if (sizeof($data) == 0) {
-            //         $user = User::find($message->sender);
-            //         $messageFrom[$key]['user'] = $user;
-            //         array_push($messageInbox, $message);
-            //     }
-            // } else if ($request->sender != $message->receiver) {
-            //     $data = Block::where('blockerID', $request->sender)
-            //         ->where('blockedID', $message->receiver)->get();
-
-            //     if (sizeof($data) == 0) {
-            //         $user = User::find($message->receiver);
-            //         $messageFrom[$key]['user'] = $user;
-            //         array_push($messageInbox, $message);
-            //     }
-            // }
         }
 
         return ['status' => 'success', 'data' => $messageInbox];
