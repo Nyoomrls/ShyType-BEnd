@@ -89,15 +89,26 @@ class MessageController extends Controller
     {
         $senderData = Personality::where('user_id', $request->sender)->get();
         $receiverData = Personality::where('user_id', $request->receiver)->get();
-    
-        
 
-        return response()->json([
-            'sender_perso' => $senderData,
-            'receiver_perso' => $receiverData,
-        ], 200);
-    }
+        $matchedQuestions = [];
+        
+        for ($i = 1; $i <= 10; $i++) {
+            $senderQuestion = 'question' . $i;
+            $receiverQuestion = 'question' . $i;
+            
+            $senderMatched = $senderData->where($senderQuestion, 1)->isNotEmpty();
+            $receiverMatched = $receiverData->where($receiverQuestion, 1)->isNotEmpty();
+            
+            $matched = $senderMatched && $receiverMatched ? 1 : 0;
+            
+            $matchedQuestions[] = $matched;
+            // $matchedQuestions = $receiverData;
+        }
+        return $matchedQuestions;
+     
     
+    }
+
 
     public function get_chats(Request $request)
     {
