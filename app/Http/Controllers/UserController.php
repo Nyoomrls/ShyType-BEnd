@@ -149,6 +149,8 @@ class UserController extends Controller
 
         $user = User::find($request->user['id']);
         $user->username = $request->user['username'];
+        $user->gender = $request->user['gender'];
+        $user->matchgender = $request->user['matchgender'];
         $user->bio = isset($request->user['bio']) ? $request->user['bio'] : "";
         $user->contact = isset($request->user['contact']) ? $request->user['contact'] : "";
         $user->profile = $compPic !== '' ? $compPic : "";
