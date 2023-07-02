@@ -9,7 +9,6 @@ use Termwind\Components\Dd;
 
 class BlockController extends Controller
 {
-    //
     public function blockUser(Request $request)
     {
 
@@ -61,7 +60,6 @@ class BlockController extends Controller
                     "status" => 200,
                 ];
             }
-
         } else {
             return [
                 "message" => "Data not found.",

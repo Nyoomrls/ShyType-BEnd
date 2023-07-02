@@ -8,10 +8,8 @@ use App\Models\Block;
 use App\Models\Matches;
 use App\Models\Personality;
 use Carbon\Carbon;
-use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Termwind\Components\Dd;
 
 class MessageController extends Controller
 {
@@ -68,7 +66,6 @@ class MessageController extends Controller
             $conversation_id = $request->sender . $request->receiver;
         }
 
-        // $messages = Message::where('conversation_id', $conversation_id)->get();
         $messages = Message::where('conversation_id', $conversation_id)->get();
         $user = User::where('id', $request->owner)->get();
 
@@ -91,22 +88,19 @@ class MessageController extends Controller
         $receiverData = Personality::where('user_id', $request->receiver)->get();
 
         $matchedQuestions = [];
-        
+
         for ($i = 1; $i <= 10; $i++) {
             $senderQuestion = 'question' . $i;
             $receiverQuestion = 'question' . $i;
-            
+
             $senderMatched = $senderData->where($senderQuestion, 1)->isNotEmpty();
             $receiverMatched = $receiverData->where($receiverQuestion, 1)->isNotEmpty();
-            
+
             $matched = $senderMatched && $receiverMatched ? 1 : 0;
-            
+
             $matchedQuestions[] = $matched;
-            // $matchedQuestions = $receiverData;
         }
         return $matchedQuestions;
-     
-    
     }
 
 

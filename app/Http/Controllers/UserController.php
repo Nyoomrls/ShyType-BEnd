@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -156,7 +155,9 @@ class UserController extends Controller
         $user->profile = $compPic !== '' ? $compPic : "";
         $user->password = isset($request->user['npassword']) ? Hash::make($password) : $password;
 
-        if (isset($request->user['ishidden'])) {$user->ishidden = $request->user['ishidden'];}
+        if (isset($request->user['ishidden'])) {
+            $user->ishidden = $request->user['ishidden'];
+        }
         $user->save();
 
         return [
